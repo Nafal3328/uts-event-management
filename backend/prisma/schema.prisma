@@ -1,0 +1,49 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model CategoryEvent {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  events    Event[]
+
+  @@map("category_events")
+}
+
+model Speaker {
+  id        String   @id @default(cuid())
+  name      String
+  expertise String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  events    Event[]
+
+  @@map("speakers")
+}
+
+model Event {
+  id          String        @id @default(cuid())
+  title       String
+  description String
+  date        DateTime
+  location    String
+  categoryId  String
+  speakerId   String
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  category    CategoryEvent @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  speaker     Speaker       @relation(fields: [speakerId], references: [id], onDelete: Restrict)
+
+  @@map("events")
+}
